@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace RSNiniChanger
 {
-    public class ProgramSulateim
+    public class CustomMenu
     {
         public static List<Option> options;
         public static void Main()
