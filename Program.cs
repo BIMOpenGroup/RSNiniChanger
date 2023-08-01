@@ -54,15 +54,8 @@
                             test.Select(server);
                         }
                     }
-                    CreateBuckup(RevitServesFolders);
-                    foreach (KeyValuePair<string, List<string>> item in RevitsAndServers)
-                    {
-                        test.AddChoiceGroup(item.Key, item.Value);
-                        foreach (string server in item.Value)
-                        {
-                            test.Select(server);
-                        }
-                    }
+                    CreateBuckup(RevitServesFolders); //как-то переделать чтобы добавились все варианты серверов но выбраны были только те что в папках автодеска
+
                     var selectedRevitServers = AnsiConsole.Prompt(test);
 
                     // Write the selected fruits to the terminal
