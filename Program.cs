@@ -10,7 +10,9 @@
         static string autodeskDataFolder = "C:\\ProgramData\\Autodesk";
         static string revitServerFolder = "Revit Server*";
         static string backupFolder = "RSNiniChanger";
+        static string fullBackupFolderPath = "";
         static Dictionary<string, List<string>> RevitsAndServers;
+        static Dictionary<string, List<string>> NewRevitsAndServers;
         static string test_read;
 
         static public void Main()
@@ -18,15 +20,15 @@
             while (test_read != "q")
             {
                 RevitsAndServers = new Dictionary<string, List<string>>();
+                NewRevitsAndServers = new Dictionary<string, List<string>>();
                 string[] RevitServesFolders;
                 if (Directory.Exists(autodeskDataFolder))
                 {
                     RevitServesFolders = Directory.GetDirectories(autodeskDataFolder, revitServerFolder, SearchOption.TopDirectoryOnly);
-                    foreach (var folder in RevitServesFolders)
+                    foreach (var autodeskFolder in RevitServesFolders)
                     {
-                        RevitsAndServers.Add(folder, GetServersFromini(folder));
+                        RevitsAndServers.Add(autodeskFolder.Replace(autodeskDataFolder, ""), GetServersFromini(autodeskFolder));
                     }
-                    CreateBuckup(RevitServesFolders);
 
                     AnsiConsole.Markup("[lime]RSNiniChanger starts[/]");
                     List<string> revitServFolder = new List<string>();
@@ -34,7 +36,7 @@
                     var selectFolder = "";
 
                     var test = new MultiSelectionPrompt<string>();
-                    test.Title("What are your [green]favorite fruits[/]?")
+                    test.Title("Select revit servers [green]to activate[/]")
                             .NotRequired()
                             .Mode(SelectionMode.Leaf)
                             .WrapAround(true)
@@ -47,19 +49,52 @@
                     foreach (KeyValuePair<string, List<string>> item in RevitsAndServers)
                     {
                         test.AddChoiceGroup(item.Key, item.Value);
+                        foreach (string server in item.Value)
+                        {
+                            test.Select(server);
+                        }
                     }
-                    var fruits = AnsiConsole.Prompt(test);
+                    CreateBuckup(RevitServesFolders);
+                    foreach (KeyValuePair<string, List<string>> item in RevitsAndServers)
+                    {
+                        test.AddChoiceGroup(item.Key, item.Value);
+                        foreach (string server in item.Value)
+                        {
+                            test.Select(server);
+                        }
+                    }
+                    var selectedRevitServers = AnsiConsole.Prompt(test);
 
                     // Write the selected fruits to the terminal
-                    foreach (string fruit in fruits)
+                    foreach (string server in selectedRevitServers)
                     {
-                        var test2 = test.GetParent(fruit);
-                        AnsiConsole.WriteLine(test2);
-                        AnsiConsole.WriteLine(fruit);
+                        string RevitName = test.GetParent(server);
+                        //string RevitIniFolerPath = fullBackupFolderPath + RevitName;
+                        if (NewRevitsAndServers.ContainsKey(RevitName))
+                        {
+                            NewRevitsAndServers[RevitName].Add(server);
+                        }
+                        else
+                        {
+                            NewRevitsAndServers[RevitName] = new List<string>() { server };
+                        }
+                    }
+                    foreach (KeyValuePair<string, List<string>> item in RevitsAndServers)
+                    {
+                        string RevitIniFolerPath = autodeskDataFolder + item.Key;
+                        if (NewRevitsAndServers.ContainsKey(item.Key))
+                        {
+                            ReplaceServersIni(RevitIniFolerPath, NewRevitsAndServers[item.Key]);
+                            //RevitsAndServers[item.Key] = NewRevitsAndServers[item.Key];
+                        }
+                        else
+                        {
+                            ReplaceServersIni(RevitIniFolerPath, new List<string>());
+                            //RevitsAndServers[item.Key] = new List<string>();
+                        }
                     }
                     AnsiConsole.Markup($"promnt [underline red]q[/] to exit\n");
                     test_read = Console.ReadLine();
-                    //Console.WriteLine($"Hello, {selectFolder}!");
                 }
                 else
                 {
@@ -73,7 +108,7 @@
         static void CreateBuckup(string[] RevitServesFolders)
         {
             var appdataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var fullBackupFolderPath = Path.Combine(appdataFolder, backupFolder);
+            fullBackupFolderPath = Path.Combine(appdataFolder, backupFolder);
             WrhiteAndNewLine(fullBackupFolderPath);
             if (Directory.Exists(fullBackupFolderPath))
             {
@@ -88,6 +123,15 @@
                     {
                         Console.WriteLine(test);
                         AddServersToini(backupFolder, test);
+                    }
+                    string folderKey = autodeskFolder.Replace(autodeskDataFolder, "");
+                    if (RevitsAndServers.ContainsKey(folderKey))
+                    {
+                        RevitsAndServers[folderKey].AddRange(test);
+                    }
+                    else
+                    {
+                        RevitsAndServers[folderKey] = test;
                     }
                     //RevitsAndServers.Add(backupFolder, GetServersFromini(backupFolder));
                 }
@@ -130,6 +174,15 @@
                 //ipList.ToList().ForEach(x => Console.WriteLine(x));
             }
             return ipList;
+        }
+
+        static void ReplaceServersIni(string folder, List<string> newServers)
+        {
+            var rsnFilePath = Path.Combine(folder, "Config", "RSN.ini");
+            if (File.Exists(rsnFilePath))
+            {
+                File.WriteAllLines(rsnFilePath, newServers);
+            }
         }
 
         static void CopyDirectory(string sourceDir, string destinationDir, bool recursive)
