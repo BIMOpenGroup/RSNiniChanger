@@ -1,4 +1,4 @@
-﻿namespace RSNiniChanger
+﻿namespace RSNiniManager
 {
     struct ServerObject : IEquatable<ServerObject>
     {

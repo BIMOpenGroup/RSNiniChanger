@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RSNiniChanger
+namespace RSNiniManager
 {
     class Utils
     {
@@ -17,6 +17,17 @@ namespace RSNiniChanger
                 foreach (var autodeskfolder in RevitServesFolders)
                 {
                     CopyDirectory(autodeskfolder, autodeskfolder.Replace(autodeskDataFolder, fullBackupFolderPath), true);
+                }
+            }
+            else
+            {
+                foreach (var autodeskfolder in RevitServesFolders)
+                {
+                    HashSet<string> servers = new HashSet<string>();
+                    string backupFolder = autodeskfolder.Replace(autodeskDataFolder, fullBackupFolderPath);
+                    GetServersFromini(backupFolder).ForEach(server => servers.Add(server));
+                    GetServersFromini(autodeskfolder).ForEach(server => servers.Add(server));
+                    SetServersIni(backupFolder, servers.ToList());
                 }
             }
         }
@@ -47,12 +58,6 @@ namespace RSNiniChanger
                     RevitsAndServers[folderKey] = backupini;
                 }
             }
-        }
-
-        public static void WrhiteAndNewLine(string text)
-        {
-            AnsiConsole.Markup($"[underline red]{text}[/]");
-            Console.WriteLine("\n");
         }
 
         public static List<ServerObject> GetServersFromini(string folder, bool marked)

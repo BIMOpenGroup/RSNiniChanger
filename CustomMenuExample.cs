@@ -3,9 +3,9 @@ using System;
 using System.Linq;
 using System.Threading;
 
-namespace RSNiniChanger
+namespace RSNiniManager
 {
-    public class CustomMenu
+    public class CustomMenuExample
     {
         public static List<Option> options;
         public static void Main()
