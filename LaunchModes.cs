@@ -113,8 +113,6 @@ namespace RSNiniManager
                     AnsiConsole.Markup($"server addet: [{Colors.selectionColor}]{newServer}[/]\n");
                 }
             }
-            //AnsiConsole.Markup($"servers of {revitFolder} is\n");
-            //currentServers.ForEach(s => AnsiConsole.Markup($" {s}\n"));
             Console.WriteLine("\n");
             AnsiConsole.Markup($"[{Colors.mainColor}]Addition completed[/]\n");
             Utils.SetServersIni(revitFolder, currentServers);
