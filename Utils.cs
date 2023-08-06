@@ -9,7 +9,7 @@ namespace RSNiniManager
 {
     class Utils
     {
-        public static void CreateBuckup(string[] RevitServesFolders, string autodeskDataFolder, string fullBackupFolderPath)
+        public static void CreateBuckup(List<string> RevitServesFolders, string autodeskDataFolder, string fullBackupFolderPath)
         {
             if (!Directory.Exists(fullBackupFolderPath))
             {
@@ -32,7 +32,7 @@ namespace RSNiniManager
             }
         }
 
-        public static void GetServersFromBackup(string[] RevitServesFolders, 
+        public static void GetServersFromBackup(List<string> RevitServesFolders, 
                                                 string autodeskDataFolder, 
                                                 string fullBackupFolderPath, 
                                                 ref Dictionary<string, List<ServerObject>> RevitsAndServers)
@@ -45,7 +45,7 @@ namespace RSNiniManager
                 string folderKey = autodeskFolder.Replace(autodeskDataFolder, "");
                 if (RevitsAndServers.ContainsKey(folderKey))
                 {
-                    foreach (var server in backupini)
+                    foreach (ServerObject server in backupini)
                     {
                         if (!RevitsAndServers[folderKey].Contains(server))
                         {
@@ -121,6 +121,51 @@ namespace RSNiniManager
                 {
                     string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
                     CopyDirectory(subDir.FullName, newDestinationDir, true);
+                }
+            }
+        }
+
+        public static string ReadLineOrEsc()
+        {
+            string retString = "";
+
+            int curIndex = 0;
+            while (true)
+            {
+                ConsoleKeyInfo readKeyResult = Console.ReadKey(true);
+
+                // handle Esc
+                if (readKeyResult.Key == ConsoleKey.Escape)
+                {
+                    Console.WriteLine();
+                    return null;
+                }
+
+                // handle Enter
+                if (readKeyResult.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return retString;
+                }
+
+                // handle backspace
+                if (readKeyResult.Key == ConsoleKey.Backspace)
+                {
+                    if (curIndex > 0)
+                    {
+                        retString = retString.Remove(retString.Length - 1);
+                        Console.Write(readKeyResult.KeyChar);
+                        Console.Write(' ');
+                        Console.Write(readKeyResult.KeyChar);
+                        curIndex--;
+                    }
+                }
+                else
+                // handle all other keypresses
+                {
+                    retString += readKeyResult.KeyChar;
+                    Console.Write(readKeyResult.KeyChar);
+                    curIndex++;
                 }
             }
         }

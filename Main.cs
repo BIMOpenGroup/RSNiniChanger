@@ -9,17 +9,21 @@
         {
             try
             {
+                if (args.Length == 0 )
+                {
+                    args = new string[] { "no valid arguments" };
+                }
                 string autodeskDataFolder = "C:\\ProgramData\\Autodesk";
-                string[] RevitServesFolders = Directory.GetDirectories(autodeskDataFolder, "Revit Server*", SearchOption.TopDirectoryOnly);
+                List<string> RevitServesFolders = Directory.GetDirectories(autodeskDataFolder, "Revit Server*", SearchOption.TopDirectoryOnly).ToList();
                 string appdataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 string fullBackupFolderPath = Path.Combine(appdataFolder, typeof(RSNiniManager).Name);
-                string consoleReadLine = "";
                 if (Directory.Exists(autodeskDataFolder))
                 {
-                    while (consoleReadLine != "q")
+                    Utils.CreateBuckup(RevitServesFolders, autodeskDataFolder, fullBackupFolderPath);
+                    while (true)
                     {
                         AnsiConsole.Clear();
-                        AnsiConsole.Markup($"[bold {Colors.mainColor}]RSNiniChanger[/]\n");
+                        AnsiConsole.Markup($"[bold {Colors.mainColor}]RSNiniManager[/]\n");
                         Console.WriteLine("run args:");
                         foreach (var arg in args)
                         {
@@ -31,11 +35,11 @@
                         }
                         else if (args[0] == "-add")
                         {
-                            LaunchModes.AddNewServers(RevitServesFolders, autodeskDataFolder, fullBackupFolderPath);
+                            LaunchModes.AddNewServers(RevitServesFolders);
                         }
                         else if (args[0] == "-remove")
                         {
-                            LaunchModes.AddNewServers(RevitServesFolders, autodeskDataFolder, fullBackupFolderPath);
+                            LaunchModes.RemoveServers(RevitServesFolders, autodeskDataFolder, fullBackupFolderPath);
                         }
                         else
                         {
@@ -44,8 +48,8 @@
                                 new SelectionPrompt<string>()
                                     .Title($"[underline {Colors.mainColor}]Select launch mode[/]\n")
                                     .HighlightStyle(Colors.selectionStyle)
-                                    .PageSize(3)
-                                    .AddChoices(new[] { "Change current servers", "Add new servers", "Remove servers" })
+                                    .PageSize(4)
+                                    .AddChoices(new[] { "Change current servers", "Add new servers", "Remove servers", "Quit"})
                                );
                             if (launchMode == "Change current servers")
                             {
@@ -53,11 +57,15 @@
                             }
                             else if (launchMode == "Add new servers")
                             {
-                                LaunchModes.AddNewServers(RevitServesFolders, autodeskDataFolder, fullBackupFolderPath);
+                                LaunchModes.AddNewServers(RevitServesFolders);
                             }
                             else if (launchMode == "Remove servers")
                             {
                                 LaunchModes.RemoveServers(RevitServesFolders, autodeskDataFolder, fullBackupFolderPath);
+                            }
+                            else if(launchMode == "Quit")
+                            {
+                                break;
                             }
                             else
                             {
@@ -65,8 +73,10 @@
                             }
                         }
                         Utils.CreateBuckup(RevitServesFolders, autodeskDataFolder, fullBackupFolderPath);
-                        AnsiConsole.Markup($"promnt [underline {Colors.attentionColor}]q[/] to exit or [underline {Colors.mainColor}]any button[/] to repeat\n");
-                        consoleReadLine = Console.ReadLine();
+                        if (args[0] != "no valid arguments")
+                        {
+                            break;
+                        }
                     }
                 }
                 else
