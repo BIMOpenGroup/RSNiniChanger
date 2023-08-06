@@ -1,11 +1,4 @@
-﻿using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RSNiniManager
+﻿namespace RSNiniManager
 {
     class Utils
     {
@@ -32,9 +25,9 @@ namespace RSNiniManager
             }
         }
 
-        public static void GetServersFromBackup(List<string> RevitServesFolders, 
-                                                string autodeskDataFolder, 
-                                                string fullBackupFolderPath, 
+        public static void GetServersFromBackup(List<string> RevitServesFolders,
+                                                string autodeskDataFolder,
+                                                string fullBackupFolderPath,
                                                 ref Dictionary<string, List<ServerObject>> RevitsAndServers)
         {
             foreach (var autodeskFolder in RevitServesFolders)

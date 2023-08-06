@@ -1,7 +1,7 @@
 ﻿namespace RSNiniManager
 {
-    using System;
     using Spectre.Console;
+    using System;
 
     public class RSNiniManager
     {
@@ -9,7 +9,7 @@
         {
             try
             {
-                if (args.Length == 0 )
+                if (args.Length == 0)
                 {
                     args = new string[] { "no valid arguments" };
                 }
@@ -49,7 +49,7 @@
                                     .Title($"[underline {Colors.mainColor}]Select launch mode[/]\n")
                                     .HighlightStyle(Colors.selectionStyle)
                                     .PageSize(4)
-                                    .AddChoices(new[] { "Change current servers", "Add new servers", "Remove servers", "Quit"})
+                                    .AddChoices(new[] { "Change current servers", "Add new servers", "Remove servers", "Quit" })
                                );
                             if (launchMode == "Change current servers")
                             {
@@ -63,7 +63,7 @@
                             {
                                 LaunchModes.RemoveServers(RevitServesFolders, autodeskDataFolder, fullBackupFolderPath);
                             }
-                            else if(launchMode == "Quit")
+                            else if (launchMode == "Quit")
                             {
                                 break;
                             }
